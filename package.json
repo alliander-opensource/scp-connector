@@ -1,0 +1,16 @@
+{
+	"name"			: "sso-scp",
+	"version"		: "0.0.1",
+	"author"		: "Nico",
+	"description"	: "Node module waarmee SSO via SCP kan ingeregeld worden",
+	"main"			: "index.js",
+	"repository"	: {
+		"type"	: "git",
+		"url"	: ""
+	},
+	"dependencies": {
+		"@sap/xsenv"	: "1.2.9",
+		"request"		: "2.88.0",
+		"util"			: "latest"
+	}
+}
