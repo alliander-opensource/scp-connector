@@ -192,30 +192,26 @@ const _private = {
 const requestSCP = async(oOptions, sAuthToken, sDestinationName) => {
 	try {
 		/*
-		Step 1 GET Destination token
-		Step 2 GET Destination object
-		Step 3 GET connectivity token
+		Step 1 GET Destination token to access the destination instance. (JWT2)
+		Step 2 GET Destination configuration object by sending JWT2.
+		Step 3 GET connectivity token to access the connectivity instance.  (JWT3)
 		Step 4 GET CSRF token  {conditional}
-		Step 5 Execute Request
-		Todo  CACHING toevoegen
+		Step 5 Execute Request to the connectivity instance with JWT3 and the Authorization header. (JWT1)
+		Step 6. SAP Cloud Platform Connectivity forwards request to the Cloud Connector
+		and sends the request to the on-premise system.
+		Todo  CACHING toevoegen op JWT en CSRF token
 		*/
 
-		/*1 GET destination token*/
+		/*Step 1  GET Destination token to access the destination instance. (JWT2) */
 		const sDestinationToken = await _private._getDestinationToken();
 
-		//console.log(`sDestinationToken ${sDestinationToken}`);
-
-		/*2 GET destination*/
+		/*Step 2  GET Destination configuration object by sending JWT2.*/
 		const oDestination = await _private._getDestination(sDestinationName, sDestinationToken);
 
-		//console.log(`oDestination ${JSON.stringify(oDestination)}`);
-
-		/*3 GET connectivity token*/
+		/*Step 3 GET connectivity token to access the connectivity instance.  (JWT3)*/
 		const sConnectivityToken = await _private._getConnectivityToken();
 
-		//console.log(`sConnectivityToken ${sConnectivityToken}`);
-
-		/* 4 GET CSRF token {conditional}
+		/*Step 4 Execute Request to the connectivity instance with JWT3 and the Authorization header. (JWT1)
 		Indien POST / PUT / DELETE dan csrf token ophalen */
 		if (["POST", "PUT", "DELETE"].indexOf(oOptions.method.toUpperCase()) > -1) {
 			//REQUEST CSRF token 
@@ -227,11 +223,9 @@ const requestSCP = async(oOptions, sAuthToken, sDestinationName) => {
 			oOptions.headers = oHeaders;
 		}
 
-		/*Step 5 Execute Request */
+		/*Step 5 Execute Request to the connectivity instance with JWT3 and the Authorization header. (JWT1) */
 		const oResult = await _private._RequestSCP(oOptions, sAuthToken, sConnectivityToken, oDestination);
 
-		//console.log(`oResult ${JSON.stringify(oResult)}`);
-		//console.log(`einde requestSCP`);
 		return oResult;
 
 	} catch (err) {
