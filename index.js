@@ -130,11 +130,14 @@ const _private = {
 						"SAP-Connectivity-Authentication": "Bearer " + sAuthToken
 					}
 				}
-
-				const oHeaders = {...oStdHeaders,
+				
+			/* Pas vanaf Node v8 beschikbaar.	
+			const oHeaders = {...oStdHeaders,
 					...oOptions.headers,
 					...oHeader
-				};
+				}; */
+
+				const oHeaders =  Object.assign(oStdHeaders, oOptions.headers, oHeader);
 
 				const oConnectivityCredentials = await _private._getConnectivityCredentials();
 
