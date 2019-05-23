@@ -13,8 +13,8 @@ In general the following steps are taken during a call to an on-premise system. 
 Then the following steps are relevant for the SCP connector module:
 
 4. Connectivity and destination instance
-	a. The module requests a JWT2 to access the destination instance.
-	b. The module requests a JWT3 to access the connectivity instance.
+	1. (a) The module requests a JWT2 to access the destination instance.
+	2. (b) The module requests a JWT3 to access the connectivity instance.
 5. The module requests the destination configuration by sending JWT2. Including an Authorization header.
 6. The module sends request to the connectivity instance with JWT3 and the Authorization header.
 7. SAP Cloud Platform Connectivity forwards request to the Cloud Connector.
