@@ -1,8 +1,8 @@
 {
-	"name"			: "sso-scp",
+	"name"			: "scp-connector",
 	"version"		: "0.0.1",
-	"author"		: "Nico",
-	"description"	: "Node module waarmee SSO via SCP kan ingeregeld worden",
+	"author"		: "Max Spanning",
+	"description"	: "This is a module that facilitates the connection from the SAP cloud to an on-premise system via the SAP Cloud Connector.",
 	"main"			: "index.js",
 	"repository"	: {
 		"type"	: "git",
@@ -11,6 +11,6 @@
 	"dependencies": {
 		"@sap/xsenv"	: "1.2.9",
 		"request"		: "2.88.0",
-		"util"			: "latest"
+		"util"			: "0.12.0"
 	}
 }
