@@ -3,7 +3,7 @@
 This is a module that facilitates the connection from the SAP cloud to an on-premise system via the SAP Cloud Connector.
 
 
-![Alt text](./images/SAP-CP-Connectivity-CF-Flow.png?raw=true "SCP proces flow")
+![Alt text](images/SAP-CP-Connectivity-CF-Flow.png?raw=true "SCP proces flow")
 
 In general the following steps are taken during a call to an on-premise system. These are also depicted in the proces flow figure.
 1. User calls an application through the AppRouter, which provides a central point of entry to business applications.
