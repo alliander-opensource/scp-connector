@@ -177,7 +177,9 @@ const _private = {
 
 				let oHeaders = new Object();
 				oHeaders["x-csrf-token"] = oFetchedToken.headers["x-csrf-token"];
-				oHeaders.Cookie = oFetchedToken.headers['set-cookie'].join(";");
+				if(oFetchedToken.headers['set-cookie']){
+					oHeaders.Cookie = oFetchedToken.headers['set-cookie'].join(";");
+				}
 				return oHeaders;
 
 			} catch (err) {
