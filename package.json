@@ -12,7 +12,7 @@
 		"registry": "https://registry.npmjs.org"
 	},
 	"dependencies": {
-		"@sap/xsenv": "1.2.9",
+		"@sap/xsenv": "2.0.0",
 		"request": "2.88.0",
 		"util": "0.12.0"
 	}
