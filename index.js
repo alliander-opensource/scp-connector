@@ -222,7 +222,7 @@ const requestSCP = async(oOptions, sAuthToken, sDestinationName) => {
 			//REQUEST CSRF token 
 			const oCsrfHeaders = await _private._fetchCsrfToken(oOptions, sAuthToken, sConnectivityToken, oDestination);
 			//Concat CSRF token + Headers from request
-			const oHeaders = Object.assign( oOptions.headers, oCsrfHeaders);
+			const oHeaders = Object.assign( oOptions.headers ? oOptions.headers : {}, oCsrfHeaders ? oCsrfHeaders : {});
 		/*	const oHeaders = {...oOptions.headers,
 				...oCsrfHeaders
 			} */
