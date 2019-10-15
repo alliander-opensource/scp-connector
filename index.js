@@ -156,7 +156,52 @@ const _private = {
 				throw new Error('Error - _RequestSCP - ' + err);
 			}
 		},
+		
+		_createSCPOptionsOpbject: async(oOptions, sAuthToken, sConnectivityToken, oDestination) => {
+			try {
+				const oStdHeaders = {
+					"Proxy-Authorization": "Bearer " + sConnectivityToken
+				};
 
+				let oHeader;
+				//Check of authTokens aanwezig zijn, dan deze gebruiken.
+				if (oDestination && oDestination.authTokens) {
+					const sValue = oDestination.authTokens[0].value,
+						sType = oDestination.authTokens[0].type;
+					oHeader = {
+						'Authorization': `${sType} ${sValue}`
+					}
+				} else {
+					oHeader = {
+						"SAP-Connectivity-Authentication": "Bearer " + sAuthToken
+					}
+				}
+				
+			/* Pas vanaf Node v8 beschikbaar.	
+			const oHeaders = {...oStdHeaders,
+					...oOptions.headers,
+					...oHeader
+				}; */
+
+				const oHeaders =  Object.assign(oStdHeaders, oOptions.headers, oHeader);
+
+				const oConnectivityCredentials = await _private._getConnectivityCredentials();
+
+				const oOptionsProxy = {
+					method: oOptions.method,
+					url: oDestination.destinationConfiguration.URL + oOptions.url, //sEndpoint,
+					proxy: `http://${oConnectivityCredentials.onpremise_proxy_host}:${oConnectivityCredentials.onpremise_proxy_port}`,
+					//proxy: `http://${sOnPremise_Proxy_Host}:${sOnPremise_Proxy_Port}`,
+					headers: oHeaders,
+					json: oOptions.json
+				};
+				
+				return oOptionsProxy;
+			} catch (err) {
+				throw new Error('Error - _createSCPOptionsOpbject - ' + err);
+			}
+		},
+		
 		_fetchCsrfToken: async(oOptions, sAuthToken, sConnectivityToken, oDestination) => {
 
 			try {
@@ -239,6 +284,53 @@ const requestSCP = async(oOptions, sAuthToken, sDestinationName) => {
 	}
 }
 
+const createSCPOptionsOpbject = async(oOptions, sAuthToken, sDestinationName) => {
+	try {
+		/*
+		Step 1 GET Destination token to access the destination instance. (JWT2)
+		Step 2 GET Destination configuration object by sending JWT2.
+		Step 3 GET connectivity token to access the connectivity instance.  (JWT3)
+		Step 4 GET CSRF token  {conditional}
+		Step 5 Execute Request to the connectivity instance with JWT3 and the Authorization header. (JWT1)
+		Step 6. SAP Cloud Platform Connectivity forwards request to the Cloud Connector
+		and sends the request to the on-premise system.
+		Todo  CACHING toevoegen op JWT en CSRF token
+		*/
+
+		/*Step 1  GET Destination token to access the destination instance. (JWT2) */
+		const sDestinationToken = await _private._getDestinationToken();
+
+		/*Step 2  GET Destination configuration object by sending JWT2.*/
+		const oDestination = await _private._getDestination(sDestinationName, sDestinationToken);
+
+		/*Step 3 GET connectivity token to access the connectivity instance.  (JWT3)*/
+		const sConnectivityToken = await _private._getConnectivityToken();
+
+		/*Step 4 Execute Request to the connectivity instance with JWT3 and the Authorization header. (JWT1)
+		Indien POST / PUT / DELETE dan csrf token ophalen */
+		if (["POST", "PUT", "DELETE"].indexOf(oOptions.method.toUpperCase()) > -1) {
+			//REQUEST CSRF token 
+			const oCsrfHeaders = await _private._fetchCsrfToken(oOptions, sAuthToken, sConnectivityToken, oDestination);
+			//Concat CSRF token + Headers from request
+			const oHeaders = Object.assign(oOptions.headers ? oOptions.headers : {}, oCsrfHeaders ? oCsrfHeaders : {});
+			/*	const oHeaders = {...oOptions.headers,
+					...oCsrfHeaders
+				} */
+			oOptions.headers = oHeaders;
+		}
+
+		/*Step 5 Execute Request to the connectivity instance with JWT3 and the Authorization header. (JWT1) */
+		const oResult = await _private._createSCPOptionsOpbject(oOptions,sAuthToken, sConnectivityToken, oDestination);
+
+		return oResult;
+
+	} catch (err) {
+		throw new Error('Error - request - ' + err);
+	}
+}
+
+
 module.exports = {
-	requestSCP
+	requestSCP,
+	createSCPOptionsOpbject
 }
