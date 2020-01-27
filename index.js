@@ -5,12 +5,18 @@ const request = require('request'),
 	xsenv = require('@sap/xsenv');
 
 const _private = {
-		_getUAACredentials: async() => {
-			const credentials = xsenv.getServices({
-				credentials: {
-					tag: "xsuaa"
-				}
-			}).credentials;
+		_getUAACredentials: async(sUaaServiceName) => {
+			let credentials = {};
+			if(sUaaServiceName){
+				credentials = xsenv.readCFServices()[sUaaServiceName].credentials;
+			}
+			else{
+				credentials = xsenv.getServices({
+					credentials: {
+						tag: "xsuaa"
+					}
+				}).credentials;
+			}
 
 			return credentials;
 		},
@@ -54,11 +60,11 @@ const _private = {
 
 		},
 
-		_getDestinationToken: async() => {
+		_getDestinationToken: async(sUaaServiceName) => {
 			try {
 
 				const oDestinationCredentials = await _private._getDestinationCredentials();
-				const oUAACredentials = await _private._getUAACredentials();
+				const oUAACredentials = await _private._getUAACredentials(sUaaServiceName);
 				const oOptionsPostDestination = {
 					url: oUAACredentials.url + '/oauth/token',
 					method: 'POST',
@@ -83,10 +89,10 @@ const _private = {
 			}
 
 		},
-		_getConnectivityToken: async() => {
+		_getConnectivityToken: async(sUaaServiceName) => {
 			try {
 				const oConnectivityCredentials = await _private._getConnectivityCredentials();
-				const oUAACredentials = await _private._getUAACredentials();
+				const oUAACredentials = await _private._getUAACredentials(sUaaServiceName);
 
 				const oOptionsPostConnectivity = {
 					url: oUAACredentials.url + '/oauth/token',
@@ -239,7 +245,7 @@ const _private = {
 	sDestinationName {string}		= Name of the destination
 	*/
 
-const requestSCP = async(oOptions, sAuthToken, sDestinationName) => {
+const requestSCP = async(oOptions, sAuthToken, sDestinationName, sUaaServiceName) => {
 	try {
 		/*
 		Step 1 GET Destination token to access the destination instance. (JWT2)
@@ -253,13 +259,13 @@ const requestSCP = async(oOptions, sAuthToken, sDestinationName) => {
 		*/
 
 		/*Step 1  GET Destination token to access the destination instance. (JWT2) */
-		const sDestinationToken = await _private._getDestinationToken();
+		const sDestinationToken = await _private._getDestinationToken(sUaaServiceName);
 
 		/*Step 2  GET Destination configuration object by sending JWT2.*/
 		const oDestination = await _private._getDestination(sDestinationName, sDestinationToken);
 
 		/*Step 3 GET connectivity token to access the connectivity instance.  (JWT3)*/
-		const sConnectivityToken = await _private._getConnectivityToken();
+		const sConnectivityToken = await _private._getConnectivityToken(sUaaServiceName);
 
 		/*Step 4 Execute Request to the connectivity instance with JWT3 and the Authorization header. (JWT1)
 		Indien POST / PUT / DELETE dan csrf token ophalen */
@@ -284,7 +290,7 @@ const requestSCP = async(oOptions, sAuthToken, sDestinationName) => {
 	}
 }
 
-const createSCPOptionsOpbject = async(oOptions, sAuthToken, sDestinationName) => {
+const createSCPOptionsOpbject = async(oOptions, sAuthToken, sDestinationName, sUaaServiceName) => {
 	try {
 		/*
 		Step 1 GET Destination token to access the destination instance. (JWT2)
@@ -298,13 +304,13 @@ const createSCPOptionsOpbject = async(oOptions, sAuthToken, sDestinationName) =>
 		*/
 
 		/*Step 1  GET Destination token to access the destination instance. (JWT2) */
-		const sDestinationToken = await _private._getDestinationToken();
+		const sDestinationToken = await _private._getDestinationToken(sUaaServiceName);
 
 		/*Step 2  GET Destination configuration object by sending JWT2.*/
 		const oDestination = await _private._getDestination(sDestinationName, sDestinationToken);
 
 		/*Step 3 GET connectivity token to access the connectivity instance.  (JWT3)*/
-		const sConnectivityToken = await _private._getConnectivityToken();
+		const sConnectivityToken = await _private._getConnectivityToken(sUaaServiceName);
 
 		/*Step 4 Execute Request to the connectivity instance with JWT3 and the Authorization header. (JWT1)
 		Indien POST / PUT / DELETE dan csrf token ophalen */
@@ -329,8 +335,19 @@ const createSCPOptionsOpbject = async(oOptions, sAuthToken, sDestinationName) =>
 	}
 }
 
+const getDestination = async (sDestinationName, sUaaServiceName) => {
+	try {
+		const sDestinationToken = await _private._getDestinationToken(sUaaServiceName);
+
+		return await _private._getDestination(sDestinationName, sDestinationToken);
+	} catch (err) {
+		throw new Error('Error - destination - ' + err);
+	}
+};
+
 
 module.exports = {
 	requestSCP,
-	createSCPOptionsOpbject
+	createSCPOptionsOpbject,
+	getDestination
 }
