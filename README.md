@@ -19,3 +19,12 @@ Then the following steps are relevant for the SCP connector module:
 6. The module sends request to the connectivity instance with JWT3 and the Authorization header.
 7. SAP Cloud Platform Connectivity forwards request to the Cloud Connector.
 8. Cloud Connector sends request to the on-premise system.
+
+*Batch requests:
+Batch requests can be sent by reading the options object with function createSCPOptionsOpbject. The formatted request can then be added as 'body' in the options object. The request can be sent by passing the options object to the npm request module.
+
+Example:
+options: {
+            "Content-Type": "multipart/mixed; boundary=batch",
+            "body": "<insert formatted batch request here>"
+}
