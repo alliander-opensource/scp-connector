@@ -1,6 +1,6 @@
 {
 	"name": "scp-connector",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"author": "Max Spanning",
 	"description": "This module facilitates the connection from the SAP cloud to an on-premise system via the SAP Cloud Connector.",
 	"main": "index.js",
