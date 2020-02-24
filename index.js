@@ -190,7 +190,7 @@ const _private = {
 				const oSCPRequestResult = await requestPromise(oOptions);
 				return oSCPRequestResult;
 			} catch (err) {
-				throw new Error('Error - _RequestSCP - ' + err);
+				throw new Error('Error - _RequestCF - ' + err);
 			}
 		},
 		
