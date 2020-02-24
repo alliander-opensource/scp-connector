@@ -39,7 +39,7 @@ const _private = {
 			return credentials;
 		},
 
-		_getDestination: async(sDestinationName, sDestToken) => {
+		_getDestination: async(sDestinationName, sDestToken, sAuthToken) => {
 			try {
 
 				const oDestinationCredentials = await _private._getDestinationCredentials();
@@ -50,6 +50,11 @@ const _private = {
 						'Authorization': 'Bearer ' + sDestToken
 					}
 				}
+
+				if (sAuthToken) {
+					oOptionsGetDestination.headers['X-user-token'] = sAuthToken;
+				}
+
 				const oDestResult = await requestPromise(oOptionsGetDestination);
 				return JSON.parse(oDestResult.body);
 
@@ -157,6 +162,32 @@ const _private = {
 				};
 
 				const oSCPRequestResult = await requestPromise(oOptionsProxy);
+				return oSCPRequestResult;
+			} catch (err) {
+				throw new Error('Error - _RequestSCP - ' + err);
+			}
+		},
+
+		_requestCF: async(oHttpRequest, oDestination) => {
+			try {
+			
+				let oHeader;
+
+				//Check of authTokens aanwezig zijn, dan deze gebruiken.		
+				const sValue = oDestination.authTokens[0].value,
+					sType = oDestination.authTokens[0].type;
+				oHeader = {
+					'Authorization': `${sType} ${sValue}`
+				}
+				
+				const oOptions = {
+					method: oHttpRequest.method,
+					url: oDestination.destinationConfiguration.URL + oHttpRequest.url,
+					headers: oHeader,
+					json: oHttpRequest.json
+				};
+
+				const oSCPRequestResult = await requestPromise(oOptions);
 				return oSCPRequestResult;
 			} catch (err) {
 				throw new Error('Error - _RequestSCP - ' + err);
@@ -345,9 +376,21 @@ const getDestination = async (sDestinationName, sUaaServiceName) => {
 	}
 };
 
+const requestCF = async (oOptions, sAuthToken, sDestinationName, sUaaServiceName) => {
+	try {
+		const sDestToken = await _private._getDestinationToken(sUaaServiceName);
+		const oAuthDestination = await _private._getDestination(sDestinationName, sDestToken, sAuthToken);
+		const oResult = await _private._requestCF(oOptions, oAuthDestination);
+		return oResult;
+	} catch (err) {
+		throw new Error('Error - CF - ' + err);
+	}
+};
+
 
 module.exports = {
 	requestSCP,
 	createSCPOptionsOpbject,
-	getDestination
+	getDestination,
+	requestCF
 }
