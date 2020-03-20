@@ -281,7 +281,7 @@ const _private = {
 	bNoEncoding {boolean}			= pass 'true' if you want the request to use no encoding (for binary download)
 	*/
 
-const requestSCP = async(oOptions, sAuthToken, sDestinationName, sUaaServiceName, bNoEncoding) => {
+const requestSCP = async(oOptions, sAuthToken, sDestinationName, sUaaServiceName, bNoEncoding = false) => {
 	try {
 		/*
 		Step 1 GET Destination token to access the destination instance. (JWT2)
