@@ -122,7 +122,7 @@ const _private = {
 
 		},
 
-		_RequestSCP: async(oOptions, sAuthToken, sConnectivityToken, oDestination) => {
+		_RequestSCP: async(oOptions, sAuthToken, sConnectivityToken, oDestination, bNoEncoding) => {
 			try {
 				const oStdHeaders = {
 					"Proxy-Authorization": "Bearer " + sConnectivityToken
@@ -160,6 +160,9 @@ const _private = {
 					headers: oHeaders,
 					json: oOptions.json
 				};
+				if (bNoEncoding) {
+					oOptionsProxy.encoding = null;
+				}
 
 				const oSCPRequestResult = await requestPromise(oOptionsProxy);
 				return oSCPRequestResult;
@@ -274,9 +277,11 @@ const _private = {
 	oOptions {object}				= Request object with url (endpoint) , method en possible headers
 	sAuthToken {string} 			= authToken 
 	sDestinationName {string}		= Name of the destination
+	sUaaServiceName {string}		= Name of the uaa service you want to authenticate to
+	bNoEncoding {boolean}			= pass 'true' if you want the request to use no encoding (for binary download)
 	*/
 
-const requestSCP = async(oOptions, sAuthToken, sDestinationName, sUaaServiceName) => {
+const requestSCP = async(oOptions, sAuthToken, sDestinationName, sUaaServiceName, bNoEncoding) => {
 	try {
 		/*
 		Step 1 GET Destination token to access the destination instance. (JWT2)
@@ -312,7 +317,7 @@ const requestSCP = async(oOptions, sAuthToken, sDestinationName, sUaaServiceName
 		}
 
 		/*Step 5 Execute Request to the connectivity instance with JWT3 and the Authorization header. (JWT1) */
-		const oResult = await _private._RequestSCP(oOptions, sAuthToken, sConnectivityToken, oDestination);
+		const oResult = await _private._RequestSCP(oOptions, sAuthToken, sConnectivityToken, oDestination, bNoEncoding);
 
 		return oResult;
 
