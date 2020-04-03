@@ -151,11 +151,14 @@ const _private = {
 				const oHeaders =  Object.assign(oStdHeaders, oOptions.headers, oHeader);
 
 				const oConnectivityCredentials = await _private._getConnectivityCredentials();
+				
+				// voor Business Application Studio
+				const sProxy = ("HTTP_PROXY" in process.env) ?  process.env.HTTP_PROXY : `http://${oConnectivityCredentials.onpremise_proxy_host}:${oConnectivityCredentials.onpremise_proxy_port}`;
 
 				const oOptionsProxy = {
 					method: oOptions.method,
 					url: oDestination.destinationConfiguration.URL + oOptions.url, //sEndpoint,
-					proxy: `http://${oConnectivityCredentials.onpremise_proxy_host}:${oConnectivityCredentials.onpremise_proxy_port}`,
+					proxy: sProxy,
 					//proxy: `http://${sOnPremise_Proxy_Host}:${sOnPremise_Proxy_Port}`,
 					headers: oHeaders,
 					json: oOptions.json
@@ -226,11 +229,14 @@ const _private = {
 				const oHeaders =  Object.assign(oStdHeaders, oOptions.headers, oHeader);
 
 				const oConnectivityCredentials = await _private._getConnectivityCredentials();
+				
+				// HTTP_PROXY voor de BAS nodig
+				const sProxy = ("HTTP_PROXY" in process.env) ?  process.env.HTTP_PROXY : `http://${oConnectivityCredentials.onpremise_proxy_host}:${oConnectivityCredentials.onpremise_proxy_port}`;
 
 				const oOptionsProxy = {
 					method: oOptions.method,
 					url: oDestination.destinationConfiguration.URL + oOptions.url, //sEndpoint,
-					proxy: `http://${oConnectivityCredentials.onpremise_proxy_host}:${oConnectivityCredentials.onpremise_proxy_port}`,
+					proxy: sProxy,
 					//proxy: `http://${sOnPremise_Proxy_Host}:${sOnPremise_Proxy_Port}`,
 					headers: oHeaders,
 					json: oOptions.json
