@@ -1,6 +1,6 @@
 {
 	"name": "scp-connector",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"author": "Max Spanning",
 	"description": "This module facilitates the connection from the SAP cloud to an on-premise system via the SAP Cloud Connector.",
 	"main": "index.js",
@@ -12,7 +12,7 @@
 		"registry": "https://registry.npmjs.org"
 	},
 	"dependencies": {
-		"@sap/xsenv": "2.0.0",
+		"@sap/xsenv": "2.2.0",
 		"request": "2.88.0",
 		"util": "0.12.0"
 	}
