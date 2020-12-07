@@ -157,7 +157,7 @@ const _private = {
 				// Voor de Business Application Studio zijn een aantal wijzigingen nodig
 				if ("HTTP_PROXY" in process.env) {
 					sProxy = process.env.HTTP_PROXY;
-					delete oHeaders["SAP-Connectivity-Authentication"];
+					delete oHeaders["SAP-Connectivity-Authentication"]; // dit voorkomt HTTP 431 Request Header Fields Too Large foutmelding
 				}
 
 				const oOptionsProxy = {
