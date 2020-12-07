@@ -136,7 +136,7 @@ const _private = {
 					oHeader = {
 						'Authorization': `${sType} ${sValue}`
 					}
-				} else {
+				} else if (!("HTTP_PROXY" in process.env)) {
 					oHeader = {
 						"SAP-Connectivity-Authentication": "Bearer " + sAuthToken
 					}
