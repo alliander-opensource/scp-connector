@@ -152,14 +152,18 @@ const _private = {
 
 				const oConnectivityCredentials = await _private._getConnectivityCredentials();
 				
-				// voor Business Application Studio
-				const sProxy = ("HTTP_PROXY" in process.env) ?  process.env.HTTP_PROXY : `http://${oConnectivityCredentials.onpremise_proxy_host}:${oConnectivityCredentials.onpremise_proxy_port}`;
+				let sProxy = `http://${oConnectivityCredentials.onpremise_proxy_host}:${oConnectivityCredentials.onpremise_proxy_port}`;
+				
+				// Voor de Business Application Studio zijn een aantal wijzigingen nodig
+				if ("HTTP_PROXY" in process.env) {
+					sProxy = process.env.HTTP_PROXY;
+					delete oHeaders["SAP-Connectivity-Authentication"]; // dit voorkomt HTTP 431 Request Header Fields Too Large foutmelding
+				}
 
 				const oOptionsProxy = {
 					method: oOptions.method,
 					url: oDestination.destinationConfiguration.URL + oOptions.url, //sEndpoint,
 					proxy: sProxy,
-					//proxy: `http://${sOnPremise_Proxy_Host}:${sOnPremise_Proxy_Port}`,
 					headers: oHeaders,
 					json: oOptions.json
 				};
