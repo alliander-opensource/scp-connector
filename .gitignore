@@ -16,3 +16,5 @@ APIExternalProducer.js
 .*/APIExternalProducer.js
 /mta_archives/
 *.che
+.idea
+node_modules
